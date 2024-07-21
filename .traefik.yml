@@ -1,0 +1,11 @@
+displayName: OAuth2 Introspection
+type: middleware
+iconPath: .assets/icon.png
+import: github.com/mubashiroliyantakath/toi
+
+summary: 'OAuth2 Introspection middleware for Traefik'
+
+testData:
+  clientid: "oauth-client"
+  clientsecret: "secret"
+  issuer: https://oauth-server/

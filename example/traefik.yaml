@@ -1,0 +1,16 @@
+accessLog: {}
+log:
+  level: DEBUG
+entryPoints:
+  web:
+    address: ':80'
+providers:
+  docker: {}
+  file:
+    filename: ./dynamic.yaml
+    watch: true
+
+experimental:
+  localPlugins:
+    example:
+      moduleName: "github.com/mubashiroliyantakath/toi"

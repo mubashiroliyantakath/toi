@@ -1,0 +1,31 @@
+# Use this for setting up the dev environment. Will need to download and run the traefik release in the root folder.
+
+name: traefik-plugin
+
+services:
+  traefik-plugin:
+    image: golang:1.22.4-bullseye
+    container_name: traefik-plugin
+    entrypoint: /bin/bash
+    working_dir: /app/
+    stdin_open: true
+    tty: true
+    volumes:
+    # the root directory of the plugin should be mapped to /app/plugins-local/src/github.com/mubashiroliyantakath/toi/
+      - ./:/app/plugins-local/src/github.com/mubashiroliyantakath/toi/
+      - /var/run/docker.sock:/var/run/docker.sock
+    develop:
+      watch:
+        - action: sync
+          path: ./
+          target: /app/
+
+  whoami:
+    # A container that exposes an API to show its IP address
+    image: traefik/whoami
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.whoami.rule: PathPrefix(`/`)
+      traefik.http.routers.whoami.entrypoints: web
+      traefik.http.routers.whoami.middlewares: my-plugin@file
+      traefik.http.services.whoami.loadbalancer.server.port: 80
