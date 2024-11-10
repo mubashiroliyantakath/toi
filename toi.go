@@ -1,4 +1,3 @@
-// Package plugindemo a demo plugin.
 package toi
 
 import (
@@ -17,9 +16,10 @@ import (
 
 // Config the plugin configuration.
 type Config struct {
-	ClientId     string `json:"clientid,omitempty"`
-	ClientSecret string `json:"clientsecret,omitempty"`
-	Issuer       string `json:"issuer,omitempty"`
+	ClientId       string `json:"clientid,omitempty"`
+	ClientSecret   string `json:"clientsecret,omitempty"`
+	Issuer         string `json:"issuer,omitempty"`
+	TokenTypeHint  string `json:"token_type_hint,omitempty"`
 }
 
 type WellKnown struct {
@@ -46,6 +46,7 @@ func CreateConfig() *Config {
 		ClientId:     "",
 		ClientSecret: "",
 		Issuer:       "",
+		TokenTypeHint: "",
 	}
 }
 
@@ -54,6 +55,7 @@ type ToiPlugin struct {
 	clientid     string
 	clientsecret string
 	issuer       string
+	tokenTypeHint string
 	name         string
 	cache        *cache.Cache
 	template     *template.Template
@@ -71,6 +73,7 @@ func New(ctx context.Context, next http.Handler, config *Config, name string) (h
 		clientid:     config.ClientId,
 		clientsecret: config.ClientSecret,
 		issuer:       config.Issuer,
+		tokenTypeHint: config.TokenTypeHint,
 		next:         next,
 		name:         name,
 		template:     template.New("demo").Delims("[[", "]]"),
@@ -113,6 +116,9 @@ func (a *ToiPlugin) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	os.Stdout.WriteString(fmt.Sprintf("introspection endpoint: %s\n", introspectionEndpont.IntrospectionEndpoint))
 
 	reqBody := fmt.Sprintf("token=%s&client_id=%s&client_secret=%s", token, a.clientid, a.clientsecret)
+	if a.tokenTypeHint != "" {
+		reqBody = fmt.Sprintf("%s&token_type_hint=%s", reqBody, a.tokenTypeHint)
+	}
 	req, err = http.NewRequest(http.MethodPost, introspectionEndpont.IntrospectionEndpoint, bytes.NewBuffer([]byte(reqBody)))
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)

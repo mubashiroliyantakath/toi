@@ -7,6 +7,7 @@ It requires the following configuration fields:
     clientid: "oauth-client"
     clientsecret: "secret"
     issuer: https://oauth-server/
+    token_type_hint: "access_token"
 ```
 
 Please see the [dynamic configuration file](./example/dynamic.yaml) in the example folder for more details.
