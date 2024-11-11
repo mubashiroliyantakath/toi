@@ -23,3 +23,5 @@ http:
           clientid: "oauth-client"
           clientsecret: "secret"
           issuer: https://oauth-server/
+          # This field is optional
+          token_type_hint: "access_token"

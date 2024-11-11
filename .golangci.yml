@@ -25,42 +25,19 @@ linters-settings:
       - FIXME
   gofumpt:
     extra-rules: true
+  tagliatelle:
+    case:
+      rules:
+        json: snake
+  errcheck:
+    enable-all: true
+    exclude-functions:
+      - os.Stdout.WriteString
 
 linters:
-  enable-all: true
-  disable:
-    - deadcode # deprecated
-    - exhaustivestruct # deprecated
-    - golint # deprecated
-    - ifshort # deprecated
-    - interfacer # deprecated
-    - maligned # deprecated
-    - nosnakecase # deprecated
-    - scopelint # deprecated
-    - scopelint # deprecated
-    - structcheck # deprecated
-    - varcheck # deprecated
-    - sqlclosecheck # not relevant (SQL)
-    - rowserrcheck # not relevant (SQL)
-    - execinquery # not relevant (SQL)
-    - cyclop # duplicate of gocyclo
-    - bodyclose # Too many false positives: https://github.com/timakin/bodyclose/issues/30
-    - dupl
-    - testpackage
-    - tparallel
-    - paralleltest
-    - nlreturn
-    - wsl
-    - exhaustive
-    - exhaustruct
-    - goerr113
-    - wrapcheck
-    - ifshort
-    - noctx
-    - lll
-    - gomnd
-    - forbidigo
-    - varnamelen
+  disable-all: true
+  enable:
+    - godox
 
 issues:
   exclude-use-default: false
