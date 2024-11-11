@@ -1,3 +1,4 @@
+// Description: Plugin to check the token against the introspection endpoint.
 package toi
 
 import (
@@ -16,16 +17,18 @@ import (
 
 // Config the plugin configuration.
 type Config struct {
-	ClientId       string `json:"clientid,omitempty"`
-	ClientSecret   string `json:"clientsecret,omitempty"`
-	Issuer         string `json:"issuer,omitempty"`
-	TokenTypeHint  string `json:"token_type_hint,omitempty"`
+	ClientId      string `json:"clientid,omitempty"`
+	ClientSecret  string `json:"clientsecret,omitempty"`
+	Issuer        string `json:"issuer,omitempty"`
+	TokenTypeHint string `json:"token_type_hint,omitempty"`
 }
 
+// WellKnown struct to hold the introspection endpoint.
 type WellKnown struct {
 	IntrospectionEndpoint string `json:"introspection_endpoint,omitempty"`
 }
 
+// IntrospectionResponse struct to hold the response from the introspection endpoint.
 type IntrospectionResponse struct {
 	Active    bool   `json:"active,omitempty"`
 	Scope     string `json:"scope,omitempty"`
@@ -43,25 +46,26 @@ type IntrospectionResponse struct {
 // CreateConfig creates the default plugin configuration.
 func CreateConfig() *Config {
 	return &Config{
-		ClientId:     "",
-		ClientSecret: "",
-		Issuer:       "",
+		ClientId:      "",
+		ClientSecret:  "",
+		Issuer:        "",
 		TokenTypeHint: "",
 	}
 }
 
+// ToiPlugin a plugin that checks the token against the introspection endpoint.
 type ToiPlugin struct {
-	next         http.Handler
-	clientid     string
-	clientsecret string
-	issuer       string
+	next          http.Handler
+	clientid      string
+	clientsecret  string
+	issuer        string
 	tokenTypeHint string
-	name         string
-	cache        *cache.Cache
-	template     *template.Template
+	name          string
+	cache         *cache.Cache
+	template      *template.Template
 }
 
-// Create a new Toi Plugin
+// Create a new Toi Plugin.
 func New(ctx context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
 
 	if config.ClientId == "" || config.ClientSecret == "" || config.Issuer == "" {
@@ -70,14 +74,14 @@ func New(ctx context.Context, next http.Handler, config *Config, name string) (h
 
 	return &ToiPlugin{
 
-		clientid:     config.ClientId,
-		clientsecret: config.ClientSecret,
-		issuer:       config.Issuer,
+		clientid:      config.ClientId,
+		clientsecret:  config.ClientSecret,
+		issuer:        config.Issuer,
 		tokenTypeHint: config.TokenTypeHint,
-		next:         next,
-		name:         name,
-		template:     template.New("demo").Delims("[[", "]]"),
-		cache:        cache.New(5*time.Minute, 10*time.Minute),
+		next:          next,
+		name:          name,
+		template:      template.New("demo").Delims("[[", "]]"),
+		cache:         cache.New(5*time.Minute, 10*time.Minute),
 	}, nil
 }
 
@@ -152,10 +156,11 @@ func (a *ToiPlugin) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	if !introspectionResponse.Active {
 		http.Error(rw, "Token is not active", http.StatusUnauthorized)
 		return
-	} else {
-		os.Stdout.WriteString("Token is active\n")
-		a.cache.Set(token, introspectionResponse, time.Duration(int64(introspectionResponse.Exp)-time.Now().Unix())*time.Second)
 	}
+
+	os.Stdout.WriteString("Token is active\n")
+	a.cache.Set(token, introspectionResponse, time.Duration(int64(introspectionResponse.Exp)-time.Now().Unix())*time.Second)
+
 	// defer resp.Body.Close()
 	// defer respIntro.Body.Close()
 	a.next.ServeHTTP(rw, req)
