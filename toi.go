@@ -1,4 +1,3 @@
-// Description: Plugin to check the token against the introspection endpoint.
 package toi
 
 import (
@@ -106,6 +105,7 @@ func (a *ToiPlugin) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		http.Error(rw, fmt.Sprintf("OpenID Config endpoint returned %d", resp.StatusCode), http.StatusInternalServerError)
@@ -134,6 +134,7 @@ func (a *ToiPlugin) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	defer respIntro.Body.Close()
 
 	switch respIntro.StatusCode {
 	case http.StatusOK:
@@ -161,7 +162,5 @@ func (a *ToiPlugin) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	os.Stdout.WriteString("Token is active\n")
 	a.cache.Set(token, introspectionResponse, time.Duration(int64(introspectionResponse.Exp)-time.Now().Unix())*time.Second)
 
-	// defer resp.Body.Close()
-	// defer respIntro.Body.Close()
 	a.next.ServeHTTP(rw, req)
 }
